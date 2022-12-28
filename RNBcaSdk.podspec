@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
   s.author             = { "author" => "author@domain.cn" }
-  s.platform     = :ios, "11.0"
+  s.platform     = :ios, "9.0"
   s.source       = { :git => "https://github.com/author/RNBcaSdk.git", :tag => "master" }
 
   s.preserve_paths = 'LICENSE', 'README.md', 'package.json', 'index.js'
@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.dependency "React"
   s.dependency "React-Core"
   s.dependency "QKMRZScanner"
-  s.dependency "OpenSSL-Universal", '1.1.180'
+  s.dependency "OpenSSL-Universal"
 
   # set config
   s.xcconfig          = { 'OTHER_LDFLAGS' => '-weak_framework CryptoKit -weak_framework CoreNFC -weak_framework CryptoTokenKit' }

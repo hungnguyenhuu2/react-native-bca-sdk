@@ -19,6 +19,7 @@
 3. In XCode, in the project navigator, select your project. Add `libRNBcaSdk.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
 4. Run your project (`Cmd+R`)<
 5. Add code below to Info.plist:
+  ```
   <key>NFCReaderUsageDescription</key>
 	<string>Use NFC to read card info</string>
   <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
@@ -27,7 +28,7 @@
     <string>A0000002472001</string>
     <string>00000000000000</string>
   </array>
-
+  ```
 #### Android
 
 1. Open up `android/app/src/main/java/[...]/MainActivity.java`
@@ -47,9 +48,19 @@
 ## Usage
 ```javascript
 import RNBcaSdk from 'react-native-bca-sdk';
+```
+### Tap & read card info via NFC
 
+Read card info
+```javascript
+RNBcaSdk.readCard({
+  idNumber: 'xxxxxxxxx',
+  dob: 'YYMMDD',
+  doe: 'YYMMDD',
+}).then(res => {
+  console.log(res);
+});
+```
 
-// TODO: What to do with the module?
 RNBcaSdk;
 ```
-  
