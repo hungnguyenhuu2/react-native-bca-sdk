@@ -13,4 +13,6 @@
 
 RCT_EXTERN_METHOD(readCard:(NSDictionary *)options resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter)
 
+RCT_EXTERN_METHOD(readCardFIS:(NSDictionary *)options resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter)
+
 @end

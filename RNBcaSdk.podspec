@@ -16,6 +16,8 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.swift_version = "5.0"
 
+  s.vendored_frameworks = 'ios/Frameworks/NFCReader.framework'
+
   # add dependency below
   s.dependency "React"
   s.dependency "React-Core"

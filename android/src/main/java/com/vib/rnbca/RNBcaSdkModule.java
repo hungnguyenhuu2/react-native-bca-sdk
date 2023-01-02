@@ -1,98 +1,38 @@
 
 package com.vib.rnbca;
 
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.module.annotations.ReactModule;
 import androidx.annotation.NonNull;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
+
 import android.util.Log;
+import android.content.Intent;
+import android.app.Activity;
 
-//import android.content.Intent;
-//import android.app.AlertDialog;
-//import android.content.DialogInterface;
-//import android.provider.Settings;
-//import android.app.AlertDialog;
-//import android.app.PendingIntent;
-//import android.content.Intent;
-//import android.nfc.NfcAdapter;
-//import android.nfc.Tag;
-//import android.os.Bundle;
-//import android.util.Log;
-//import android.widget.TextView;
-//import androidx.appcompat.app.AppCompatActivity;
-//import com.htc.sdk.IDCardReader;
-//import com.htc.sdk.model.CardResult;
-//import com.htc.sdk.model.IDCardDetail;
-//import com.htc.sdk.model.ResultCode;
-import com.vib.rnbca.ReadTask;
+import com.fis.ekyc.nfc.build_in.model.ResultCode;
+import com.fis.nfc.sdk.nfc.stepNfc.NFCStepActivity;
+import com.fis.nfc.sdk.nfc.util.CustomNfcSdk;
+import com.fis.nfc.sdk.nfc.util.CustomSdk;
 
-
-import com.vib.rnbca.TagTechnologyRequest;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import com.facebook.react.bridge.Callback;
 
 @ReactModule(name = RNBcaSdkModule.NAME)
 public class RNBcaSdkModule extends ReactContextBaseJavaModule {
   public static final String NAME = "RNBcaSdk";
   private final ReactApplicationContext reactContext;
     private String TAG = "HUNGNH123";
-    private IsoDep isoDep;
-    private TagTechnologyRequest techRequest = null;
-private ReadTask readTask = null;
+    public String value = "";
+    private static final int REQUEST_CODE_EXAMPLE = 0x9345;
+    Callback callback;
   public RNBcaSdkModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
-    this.isoDep = isoDep;
-//      performTagOperations();
   }
-//
-//    private void performTagOperations() {
-//        Log.d(TAG, "onNewIntent tag $tag");
-//        ReadTask readTask = new ReadTask(this.isoDep);
-//        readTask.execute();
-//    }
-
-    private void startNfc() {
-        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this.reactContext);
-        Log.d(TAG, "startNfc: $adapter");
-        if (adapter == null) {
-            Log.d(TAG, "adapter == null");
-//            finish()
-//            return
-        }
-//        performTagOperations();
-//        if (!adapter.isEnabled) {
-//            Log.d(TAG, "Chưa bật NFC")
-//            alertDialog = AlertDialog.Builder(this)
-//                    .setTitle("Chưa bật NFC")
-//                    .setMessage("Vui lòng bật NFC trong Settings để tiếp tục")
-//                    .setCancelable(false)
-//                    .setPositiveButton("Cài đặt") { _, _ ->
-//                    val intent = Intent(android.provider.Settings.ACTION_NFC_SETTINGS)
-//                startActivity(intent)
-//            }
-//                .setNegativeButton("Bỏ qua") { _, _ ->
-//                    finish()
-//            }.create()
-//            alertDialog?.show()
-//        } else {
-//            mNfcPendingIntent = PendingIntent.getActivity(
-//                    this@MainActivity,
-//            0, Intent(this@MainActivity, MainActivity::class.java)
-//                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE
-//            )
-//        }
-    }
-
-
 
   @Override
   @NonNull
@@ -100,135 +40,80 @@ private ReadTask readTask = null;
     return NAME;
   }
 
-  @ReactMethod
-  public void readCard(String cccdId,ReadableArray techs, Promise promise) {
+    @ReactMethod
+    public void init(String cccdId) {
+        try {
+
+            CustomSdk.Companion.setBaseUrl("https://apig.idcheck.xplat.online/");
+            CustomSdk.Companion.setIdCard(cccdId);
+            CustomSdk.Companion.setAccessToken("eyJ4NXQiOiJPR1ZqTVRNME0yTTFOVFZqTkRNME5EWm1OV0ZsTURSbE1qVTFOVEl4T1dZME1HRTJNMlU1WWciLCJraWQiOiJOekZtTmpFek5XSTNNelE0WWpGaU9HSTVZall5TTJGaVptTXlPREEyTVdaaE5UaG1aakF4TldJNE5ERTJZakl3TnpjMllqWmlZakpsTVRkaU16VTVaUV9SUzI1NiIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJ2aWJfcG9jIiwiYXV0IjoiQVBQTElDQVRJT05fVVNFUiIsImF1ZCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJuYmYiOjE2NzIzOTg5MDIsImF6cCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJzY29wZSI6ImNoZWNrX25mY19iY2EgY29udGVudF9tYXRjaGluZ19vY3JfbmZjIGRvY19uZmMgaGFzaF9jaGVja19uZmMgb3BlbmlkIHNlc3Npb25fMjIxMjMwMTExNTAyIiwiaXNzIjoiaHR0cHM6XC9cL2lkY2hlY2suZWlkLnhwbGF0Lm9ubGluZTo0NDNcL29hdXRoMlwvdG9rZW4iLCJncm91cHMiOlsidXNlci1jaGVjay1uZmMtYmNhIiwidXNlci1uZmMiLCJJbnRlcm5hbFwvZXZlcnlvbmUiLCJ1c2VyLWhhc2gtY2hlY2stbmZjIl0sImV4cCI6MTY3MjQxNjkwMiwiaWF0IjoxNjcyMzk4OTAyLCJqdGkiOiIyZTlmMWI2ZS1jMDFmLTQ2OWItOWRjZi05ZDVlODhhY2Y3NmIifQ.MYC1cNBTG-4FVhB4cqDlUZls9reA_NFdS6krDnPZ986qG3bVl5ZDhezVojabZChmGjXr36g10-9oN9wSqfEOE6M0_mmNkxtiw4iwpRr8xStAljZGfLCpMIYprf6DMAPwnakhJYYfGkfo0e8B7Py3npJi4cAM3EmmlKqwOaMmnvTYsi30WT5WcfmYuKCsGat5eQMkgb9TEXzdLhCwsrf01MhkfMD8F45BPxbW5F9Uz8I735v6fAqKAPhewm_LwfpyXPRfN6vcB5RwAFqHGWynD2FKt0VLRSoi3xwQ-RvTau6r_yDA0DJcLloqJHalrUQ9AfajvLpzL1feYFXOHB4NJA");
+            CustomSdk.Companion.setCkeckBoCA(true);
+            Log.d(TAG, "CustomSdk>>>>>" +CustomSdk.Companion.getBaseUrl());
+            Activity currentActivity = getCurrentActivity();
+
+            Intent intent = new Intent(this.reactContext,  NFCStepActivity.class);
+            // return when nfc success
+            currentActivity.startActivity(intent);
+            currentActivity.finish();
+        } catch (Exception e) {
+            return;
+        }
+    }
+    @ReactMethod
+  public void readCard(String cccdId, Promise promise) {
       try {
 
-//          Tag tag1 = techRequest.getTagHandle();
-         Log.d(TAG, "techs>>>>>>>>"+techs);
-//          Log.d(TAG, "techs222222>>>>>>>>"+techs.toArrayList());
-         techRequest = new TagTechnologyRequest(techs.toArrayList());
-         Log.d(TAG, "techRequest>>>>>>>>1111111111"+techRequest.toString());
-         Log.d(TAG, "onNewIntent tag $techRequest");
-         Tag tag1 = techRequest.getTagHandle();
+          CustomSdk.Companion.setBaseUrl("https://apig.idcheck.xplat.online/");
+          CustomSdk.Companion.setIdCard(cccdId);
+          CustomSdk.Companion.setAccessToken("eyJ4NXQiOiJPR1ZqTVRNME0yTTFOVFZqTkRNME5EWm1OV0ZsTURSbE1qVTFOVEl4T1dZME1HRTJNMlU1WWciLCJraWQiOiJOekZtTmpFek5XSTNNelE0WWpGaU9HSTVZall5TTJGaVptTXlPREEyTVdaaE5UaG1aakF4TldJNE5ERTJZakl3TnpjMllqWmlZakpsTVRkaU16VTVaUV9SUzI1NiIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJ2aWJfcG9jIiwiYXV0IjoiQVBQTElDQVRJT05fVVNFUiIsImF1ZCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJuYmYiOjE2NzIzOTg5MDIsImF6cCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJzY29wZSI6ImNoZWNrX25mY19iY2EgY29udGVudF9tYXRjaGluZ19vY3JfbmZjIGRvY19uZmMgaGFzaF9jaGVja19uZmMgb3BlbmlkIHNlc3Npb25fMjIxMjMwMTExNTAyIiwiaXNzIjoiaHR0cHM6XC9cL2lkY2hlY2suZWlkLnhwbGF0Lm9ubGluZTo0NDNcL29hdXRoMlwvdG9rZW4iLCJncm91cHMiOlsidXNlci1jaGVjay1uZmMtYmNhIiwidXNlci1uZmMiLCJJbnRlcm5hbFwvZXZlcnlvbmUiLCJ1c2VyLWhhc2gtY2hlY2stbmZjIl0sImV4cCI6MTY3MjQxNjkwMiwiaWF0IjoxNjcyMzk4OTAyLCJqdGkiOiIyZTlmMWI2ZS1jMDFmLTQ2OWItOWRjZi05ZDVlODhhY2Y3NmIifQ.MYC1cNBTG-4FVhB4cqDlUZls9reA_NFdS6krDnPZ986qG3bVl5ZDhezVojabZChmGjXr36g10-9oN9wSqfEOE6M0_mmNkxtiw4iwpRr8xStAljZGfLCpMIYprf6DMAPwnakhJYYfGkfo0e8B7Py3npJi4cAM3EmmlKqwOaMmnvTYsi30WT5WcfmYuKCsGat5eQMkgb9TEXzdLhCwsrf01MhkfMD8F45BPxbW5F9Uz8I735v6fAqKAPhewm_LwfpyXPRfN6vcB5RwAFqHGWynD2FKt0VLRSoi3xwQ-RvTau6r_yDA0DJcLloqJHalrUQ9AfajvLpzL1feYFXOHB4NJA");
+          CustomSdk.Companion.setCkeckBoCA(true);
+          Log.d(TAG, "CustomSdk>>>>>" +CustomSdk.Companion.getBaseUrl());
+          Activity currentActivity = getCurrentActivity();
 
-//          techRequest = new TagTechnologyRequest(isoDep.toArrayList());
-//                    Log.d(TAG, "techRequest>>>>>>>>>>>> "+ techRequest);
-//          Intent intent = new Intent(this.reactContext, this.getClass());
-          Tag tag =
-          Log.d(TAG, "readCard>>>>>>>>"+ techs);
-//          Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-           readTask = new ReadTask(IsoDep.get(tag1));
-          readTask.execute();
-          
-//          Log.d(TAG, "Chạy đến chưa: ");
-//          IDCardReader rd = new IDCardReader();
-//          mCardResult = rd.readData(isoDep, "001094023646", true, true, true);
-//          CardResult result = mCardResult;
-//          if (result != null && (result.getCode() == ResultCode.SUCCESS || result.getCode() == ResultCode.SUCCESS_WITH_WARNING)) {
-//              promise.resolve(null);
-//              citizenInfo = rd.parseCardDetail(result);
-//
-//          }
-//          Log.d(TAG, "Read data result code: " + result.getCode() + "; Hash Checking: " + result.getHashCheck() +
-//                  "; Chip Authentication: " + result.getChipCheck() +
-//                  "; Activate Authentication: " + result.getActiveCheck());
+          Intent intent = new Intent(this.reactContext,  NFCStepActivity.class);
+          // return when nfc success
+
+          CustomNfcSdk.Companion.setNfcFinishCallback(new Function1<String, Unit>() {
+              @Override
+              public Unit invoke(String s) {
+                  Log.d(TAG, "wwwwwqqqqqq>>>>>" +s);
+                  value = s;
+                  Log.d(TAG, "value11qqqqqqqq>>>>>" +value);
+                  promise.resolve(value);
+                  return null;
+              }
+          });
+          // return when error
+          CustomNfcSdk.Companion.setErrorCallback(new Function1<String, Unit>() {
+              @Override
+              public Unit invoke(String s) {
+
+                  promise.reject("READ_INFO_ERROR", "setErrorCallback");
+                  return null;
+              }
+          });
+          Log.d(TAG, "value>>>>>>>>>>" +value);
+
+          CustomNfcSdk.Companion.setErrorCodeCallback(new Function1<ResultCode, Unit>() {
+              @Override
+              public Unit invoke(ResultCode resultCode) {
+                  promise.reject("READ_INFO_ERROR", "setErrorCodeCallback");
+                  return null;
+
+              }
+          });
+          currentActivity.startActivity(intent);
       } catch (Exception e) {
-//          Log.d(TAG, "Read data result code: " + "éo rõ đúng sai");
-          promise.reject("READ_INFO_ERROR", "DATA_INVAL21212D");
+          return;
       }
-    promise.reject("READ_INFO_ERROR", "DATA_INVAL21212D");
+        promise.resolve(value);
+
   }
 
     @ReactMethod
     public void demo(String cccdId,String abc, Promise promise) {
         Log.d(TAG, "demo>>>>>>>>>>>> ");
          promise.reject("READ_INFO_ERROR", "DATA_INVAL21212D");
-         return ;
+         return;
     }
-
-
 }
-// package com.vib.rnbca;
-
-// import static android.content.ContentValues.TAG;
-
-// import com.facebook.react.bridge.ReactApplicationContext;
-// import com.facebook.react.bridge.ReactContextBaseJavaModule;
-// import com.facebook.react.bridge.ReactMethod;
-
-// import com.facebook.react.bridge.Promise;
-
-// import com.facebook.react.module.annotations.ReactModule;
-// import androidx.annotation.NonNull;
-
-// import android.content.Intent;
-// import android.nfc.NfcAdapter;
-// import android.app.AlertDialog;
-// import android.content.DialogInterface;
-// import android.nfc.tech.IsoDep;
-// import android.provider.Settings;
-// import android.util.Log;
-
-// import com.htc.sdk.IDCardReader;
-// import com.htc.sdk.model.CardResult;
-// import com.htc.sdk.model.IDCardDetail;
-// import com.htc.sdk.model.ResultCode;
-
-// @ReactModule(name = RNBcaSdkModule.NAME)
-// public class RNBcaSdkModule extends ReactContextBaseJavaModule {
-//   public static final String NAME = "RNBcaSdk";
-//   private final ReactApplicationContext reactContext;
-//   private AlertDialog.Builder alertDialog;
-//   private IsoDep isoDep;
-//   private IDCardDetail citizenInfo = new IDCardDetail();
-//   private CardResult mCardResult;
-
-//     ReadTask readTask;
-//   public RNBcaSdkModule(ReactApplicationContext reactContext) {
-//     super(reactContext);
-//     this.reactContext = reactContext;
-//     // eidReadCard = new ReadCard(new EidResultInfo(reactContext));
-//   }
-
-
-
-//   @Override
-//   @NonNull
-//   public String getName() {
-//     return NAME;
-//   }
-
-//   @ReactMethod
-//   public void readCard(String cccdId,String abc, Promise promise) {
-//       try {
-// //          readTask = new ReadTask(this.isoDep);
-// //          readTask.execute();
-//           // Log.d(TAG, "Chạy đến chưa: ");
-//           IDCardReader rd = new IDCardReader();
-//           mCardResult = rd.readData(isoDep, "001094023646", true, true, true);
-//           CardResult result = mCardResult;
-//           promise.resolve(null);
-//           if (result != null && (result.getCode() == ResultCode.SUCCESS || result.getCode() == ResultCode.SUCCESS_WITH_WARNING)) {
-//               citizenInfo = rd.parseCardDetail(result);
-//           }
-//           // Log.d(TAG, "Read data result code: " + result.getCode() + "; Hash Checking: " + result.getHashCheck() +
-//           //         "; Chip Authentication: " + result.getChipCheck() +
-//           //         "; Activate Authentication: " + result.getActiveCheck());
-//           return;
-//       } catch (Exception e) {
-//          Log.d(TAG, "Read data result code: " + e);
-//           promise.reject("READ_INFO_ERROR", "DATA_INVAL21212D");
-//       }
-//     promise.reject("READ_INFO_ERROR", "DATA_INVAL21212D");
-//       return ;
-//   }
-
-//     @ReactMethod
-//   public void demo(String cccdId,String abc, Promise promise) {
-//     System.out.println("Process>>>>>>>");
-//     promise.reject("READ_INFO_ERROR", "DATA_INVAL21212D");
-//       return ;
-//   }
-
-// }
