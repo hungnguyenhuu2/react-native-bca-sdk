@@ -27,11 +27,14 @@ public class RNBcaSdkModule extends ReactContextBaseJavaModule {
   private final ReactApplicationContext reactContext;
     private String TAG = "HUNGNH123";
     public String value = "";
+    public   EidResultInfo eidResultInfo;
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     Callback callback;
   public RNBcaSdkModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+       eidResultInfo = new EidResultInfo(reactContext);
+//      eidReadCard = new ReadCard(new EidResultInfo(reactContext));
   }
 
   @Override
@@ -46,7 +49,7 @@ public class RNBcaSdkModule extends ReactContextBaseJavaModule {
 
             CustomSdk.Companion.setBaseUrl("https://apig.idcheck.xplat.online/");
             CustomSdk.Companion.setIdCard(cccdId);
-            CustomSdk.Companion.setAccessToken("eyJ4NXQiOiJPR1ZqTVRNME0yTTFOVFZqTkRNME5EWm1OV0ZsTURSbE1qVTFOVEl4T1dZME1HRTJNMlU1WWciLCJraWQiOiJOekZtTmpFek5XSTNNelE0WWpGaU9HSTVZall5TTJGaVptTXlPREEyTVdaaE5UaG1aakF4TldJNE5ERTJZakl3TnpjMllqWmlZakpsTVRkaU16VTVaUV9SUzI1NiIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJ2aWJfcG9jIiwiYXV0IjoiQVBQTElDQVRJT05fVVNFUiIsImF1ZCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJuYmYiOjE2NzIzOTg5MDIsImF6cCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJzY29wZSI6ImNoZWNrX25mY19iY2EgY29udGVudF9tYXRjaGluZ19vY3JfbmZjIGRvY19uZmMgaGFzaF9jaGVja19uZmMgb3BlbmlkIHNlc3Npb25fMjIxMjMwMTExNTAyIiwiaXNzIjoiaHR0cHM6XC9cL2lkY2hlY2suZWlkLnhwbGF0Lm9ubGluZTo0NDNcL29hdXRoMlwvdG9rZW4iLCJncm91cHMiOlsidXNlci1jaGVjay1uZmMtYmNhIiwidXNlci1uZmMiLCJJbnRlcm5hbFwvZXZlcnlvbmUiLCJ1c2VyLWhhc2gtY2hlY2stbmZjIl0sImV4cCI6MTY3MjQxNjkwMiwiaWF0IjoxNjcyMzk4OTAyLCJqdGkiOiIyZTlmMWI2ZS1jMDFmLTQ2OWItOWRjZi05ZDVlODhhY2Y3NmIifQ.MYC1cNBTG-4FVhB4cqDlUZls9reA_NFdS6krDnPZ986qG3bVl5ZDhezVojabZChmGjXr36g10-9oN9wSqfEOE6M0_mmNkxtiw4iwpRr8xStAljZGfLCpMIYprf6DMAPwnakhJYYfGkfo0e8B7Py3npJi4cAM3EmmlKqwOaMmnvTYsi30WT5WcfmYuKCsGat5eQMkgb9TEXzdLhCwsrf01MhkfMD8F45BPxbW5F9Uz8I735v6fAqKAPhewm_LwfpyXPRfN6vcB5RwAFqHGWynD2FKt0VLRSoi3xwQ-RvTau6r_yDA0DJcLloqJHalrUQ9AfajvLpzL1feYFXOHB4NJA");
+            CustomSdk.Companion.setAccessToken("eyJ4NXQiOiJPR1ZqTVRNME0yTTFOVFZqTkRNME5EWm1OV0ZsTURSbE1qVTFOVEl4T1dZME1HRTJNMlU1WWciLCJraWQiOiJOekZtTmpFek5XSTNNelE0WWpGaU9HSTVZall5TTJGaVptTXlPREEyTVdaaE5UaG1aakF4TldJNE5ERTJZakl3TnpjMllqWmlZakpsTVRkaU16VTVaUV9SUzI1NiIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJ2aWJfcG9jIiwiYXV0IjoiQVBQTElDQVRJT05fVVNFUiIsImF1ZCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJuYmYiOjE2NzI3MTI0NDQsImF6cCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJzY29wZSI6ImNoZWNrX25mY19iY2EgY29udGVudF9tYXRjaGluZ19vY3JfbmZjIGRvY19uZmMgaGFzaF9jaGVja19uZmMgb3BlbmlkIHNlc3Npb25fMjMwMTAzMDIyMDQ0IiwiaXNzIjoiaHR0cHM6XC9cL2lkY2hlY2suZWlkLnhwbGF0Lm9ubGluZTo0NDNcL29hdXRoMlwvdG9rZW4iLCJncm91cHMiOlsidXNlci1jaGVjay1uZmMtYmNhIiwidXNlci1uZmMiLCJJbnRlcm5hbFwvZXZlcnlvbmUiLCJ1c2VyLWhhc2gtY2hlY2stbmZjIl0sImV4cCI6MTY3MjczMDQ0NCwiaWF0IjoxNjcyNzEyNDQ0LCJqdGkiOiIyZjk5NzQ4MC1jZTFmLTQyZGEtYWM2MS1kMzZiYjBiMzc0ZjAifQ.ISjIosIMehirLgxZcP-r4fZgai7XtVyL-Wr0rhsZE3Lgo-oqYPNvreVrM2pDGgk5ISWC1dRHk0igLQrpRTRI5UrcZXtWfSSetgQIT0GtwAb2Rul20rL1Gity_xrRsoPvizJiCGKXkfnn1KJ9dUoRSDNnh32LIdpplpjkNiVBxLysIg8VJzarS5tWqXUrWKnxx_SJjYfwTaYe_XAPsCQ6D_CtumCneNXcL6vQkPtZhNeLnildv7HCZDGqSd1tnJjOgX0Z3GXFd-cgFIdGJxO2zD8_BuAc-87YPOpH93-Woyz_fWvcx--fONJU7sMOs912xB2SxTsmab_7G9HPyWq6wg");
             CustomSdk.Companion.setCkeckBoCA(true);
             Log.d(TAG, "CustomSdk>>>>>" +CustomSdk.Companion.getBaseUrl());
             Activity currentActivity = getCurrentActivity();
@@ -60,14 +63,13 @@ public class RNBcaSdkModule extends ReactContextBaseJavaModule {
         }
     }
     @ReactMethod
-  public void readCard(String cccdId, Promise promise) {
+  public void readCardFIS(String token,String cccdId, Promise promise) {
       try {
 
           CustomSdk.Companion.setBaseUrl("https://apig.idcheck.xplat.online/");
           CustomSdk.Companion.setIdCard(cccdId);
-          CustomSdk.Companion.setAccessToken("eyJ4NXQiOiJPR1ZqTVRNME0yTTFOVFZqTkRNME5EWm1OV0ZsTURSbE1qVTFOVEl4T1dZME1HRTJNMlU1WWciLCJraWQiOiJOekZtTmpFek5XSTNNelE0WWpGaU9HSTVZall5TTJGaVptTXlPREEyTVdaaE5UaG1aakF4TldJNE5ERTJZakl3TnpjMllqWmlZakpsTVRkaU16VTVaUV9SUzI1NiIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJ2aWJfcG9jIiwiYXV0IjoiQVBQTElDQVRJT05fVVNFUiIsImF1ZCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJuYmYiOjE2NzIzOTg5MDIsImF6cCI6IndiSFM1WE5vN1dQOWFBbG1fX1N1emNUOFIxRWEiLCJzY29wZSI6ImNoZWNrX25mY19iY2EgY29udGVudF9tYXRjaGluZ19vY3JfbmZjIGRvY19uZmMgaGFzaF9jaGVja19uZmMgb3BlbmlkIHNlc3Npb25fMjIxMjMwMTExNTAyIiwiaXNzIjoiaHR0cHM6XC9cL2lkY2hlY2suZWlkLnhwbGF0Lm9ubGluZTo0NDNcL29hdXRoMlwvdG9rZW4iLCJncm91cHMiOlsidXNlci1jaGVjay1uZmMtYmNhIiwidXNlci1uZmMiLCJJbnRlcm5hbFwvZXZlcnlvbmUiLCJ1c2VyLWhhc2gtY2hlY2stbmZjIl0sImV4cCI6MTY3MjQxNjkwMiwiaWF0IjoxNjcyMzk4OTAyLCJqdGkiOiIyZTlmMWI2ZS1jMDFmLTQ2OWItOWRjZi05ZDVlODhhY2Y3NmIifQ.MYC1cNBTG-4FVhB4cqDlUZls9reA_NFdS6krDnPZ986qG3bVl5ZDhezVojabZChmGjXr36g10-9oN9wSqfEOE6M0_mmNkxtiw4iwpRr8xStAljZGfLCpMIYprf6DMAPwnakhJYYfGkfo0e8B7Py3npJi4cAM3EmmlKqwOaMmnvTYsi30WT5WcfmYuKCsGat5eQMkgb9TEXzdLhCwsrf01MhkfMD8F45BPxbW5F9Uz8I735v6fAqKAPhewm_LwfpyXPRfN6vcB5RwAFqHGWynD2FKt0VLRSoi3xwQ-RvTau6r_yDA0DJcLloqJHalrUQ9AfajvLpzL1feYFXOHB4NJA");
+          CustomSdk.Companion.setAccessToken(token);
           CustomSdk.Companion.setCkeckBoCA(true);
-          Log.d(TAG, "CustomSdk>>>>>" +CustomSdk.Companion.getBaseUrl());
           Activity currentActivity = getCurrentActivity();
 
           Intent intent = new Intent(this.reactContext,  NFCStepActivity.class);
@@ -76,9 +78,10 @@ public class RNBcaSdkModule extends ReactContextBaseJavaModule {
           CustomNfcSdk.Companion.setNfcFinishCallback(new Function1<String, Unit>() {
               @Override
               public Unit invoke(String s) {
-                  Log.d(TAG, "wwwwwqqqqqq>>>>>" +s);
+                  Log.d(TAG, "ssssss>>>>>" +s);
                   value = s;
-                  Log.d(TAG, "value11qqqqqqqq>>>>>" +value);
+                  Log.d(TAG, "value>>>>>" +value);
+                  eidResultInfo.onSuccess(s);
                   promise.resolve(value);
                   return null;
               }
@@ -87,17 +90,20 @@ public class RNBcaSdkModule extends ReactContextBaseJavaModule {
           CustomNfcSdk.Companion.setErrorCallback(new Function1<String, Unit>() {
               @Override
               public Unit invoke(String s) {
-
-                  promise.reject("READ_INFO_ERROR", "setErrorCallback");
+                  Log.d(TAG, "setErrorCallback>>>>>>>>>>" +s);
+                  eidResultInfo.ErrorCallback(s);
+                  promise.resolve(null);
                   return null;
               }
           });
           Log.d(TAG, "value>>>>>>>>>>" +value);
-
           CustomNfcSdk.Companion.setErrorCodeCallback(new Function1<ResultCode, Unit>() {
               @Override
               public Unit invoke(ResultCode resultCode) {
-                  promise.reject("READ_INFO_ERROR", "setErrorCodeCallback");
+                  Log.d(TAG, "resultCode>>>>>>>>>>" +resultCode);
+//                  promise.reject("READ_INFO_ERROR", "setErrorCodeCallback");
+                  eidResultInfo.ErrorCodeCallback(resultCode.toString());
+                  promise.resolve(null);
                   return null;
 
               }
