@@ -1,14 +1,8 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
-// const { RNBcaSdk } = NativeModules;
-
-// export default RNBcaSdk;
-
-
-
 export const UNKNOWN_ERROR = 'Lỗi không xác định';
 const LINKING_ERROR =
-    `The package 'react-native-eid-sdk' doesn't seem to be linked. Make sure: \n\n` +
+    `The package 'react-native-bca-sdk' doesn't seem to be linked. Make sure: \n\n` +
     Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
     '- You rebuilt the app after installing the package\n' +
     '- You are not using Expo managed workflow\n';
@@ -57,7 +51,7 @@ class RNBcaSdkJS {
             );
         }
 
-        return EidSdk.init(url);
+        return RNBcaSdk.init(url);
     };
 
     getEventEmitter = () => {
@@ -78,4 +72,4 @@ class RNBcaSdkJS {
     };
 }
 
-export default new RNBcaSdkJS();
+export default Platform.OS === 'ios' ? RNBcaSdk : new RNBcaSdkJS();
